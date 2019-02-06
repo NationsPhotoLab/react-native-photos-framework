@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const configPath = path.join(process.cwd(), '../../package.json');
-if (fs.existsSync(configPath)) {
+if (fs.existsSync(configPath) && process.env.INSTALL_ON_CI != 'true') {
     const rnpmConfig = require('./local-cli/core/config');
     const link = require('./local-cli/link/link.js');
     const xcode = require('xcode');
