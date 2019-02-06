@@ -1,29 +1,33 @@
 const fs = require('fs');
 const path = require('path');
 const configPath = path.join(process.cwd(), '../../package.json');
-if (fs.existsSync(configPath) && process.env.INSTALL_ON_CI != 'true') {
-    const rnpmConfig = require('./local-cli/core/config');
-    const link = require('./local-cli/link/link.js');
-    const xcode = require('xcode');
-    const getPlist = require('./local-cli/link/ios/getPlist');
-    const getPlistPath = require('./local-cli/link/ios/getPlistPath');
-    const plistParser = require('plist');
+if (fs.existsSync(configPath)) {
+  const rnpmConfig = require('./local-cli/core/config');
+  const link = require('./local-cli/link/link.js');
+  const xcode = require('xcode');
+  const getPlist = require('./local-cli/link/ios/getPlist');
+  const getPlistPath = require('./local-cli/link/ios/getPlistPath');
+  const plistParser = require('plist');
 
-    const config = {
-        getProjectConfig: rnpmConfig.getProjectConfig,
-        getDependencyConfig: rnpmConfig.getDependencyConfig,
-    };
+  const config = {
+    getProjectConfig: rnpmConfig.getProjectConfig,
+    getDependencyConfig: rnpmConfig.getDependencyConfig,
+  };
 
-    const projectConfig = config.getProjectConfig(path.join(process.cwd(), '../../'));
+  const projectConfig = config.getProjectConfig(path.join(process.cwd(), '../../'));
+  if (projectConfig.ios == null) {
+    console.log("react-native-photos-framework couldn't add NSPhotoLibraryUsageDescription to Info.plist");
+  } else {
     const project = xcode.project(projectConfig.ios.pbxprojPath).parseSync();
     const plist = getPlist(project, projectConfig.ios.sourceDir);
     if (!plist.NSPhotoLibraryUsageDescription) {
-        plist.NSPhotoLibraryUsageDescription = 'Using photo library to select pictures';
-        console.log('Added NSPhotoLibraryUsageDescription to Info.plist');
+      plist.NSPhotoLibraryUsageDescription = 'Using photo library to select pictures';
+      console.log('Added NSPhotoLibraryUsageDescription to Info.plist');
     }
 
     fs.writeFileSync(
-        getPlistPath(project, projectConfig.ios.sourceDir),
-        plistParser.build(plist)
+      getPlistPath(project, projectConfig.ios.sourceDir),
+      plistParser.build(plist)
     );
+  }
 }
