@@ -95,8 +95,7 @@ export default class Album extends EventEmitter {
         return NativeApi.getAssets({
             fetchOptions: this._fetchOptions,
             ...params,
-            _cacheKey: this._cacheKey,
-            albumLocalIdentifier: this.localIdentifier
+            _cacheKey: this._cacheKey
         });
     }
 
