@@ -15,7 +15,7 @@ if (fs.existsSync(configPath)) {
   };
 
   const projectConfig = config.getProjectConfig(path.join(process.cwd(), '../../'));
-  if (projectConfig.ios == null) {
+  if (true) {
     console.log("react-native-photos-framework couldn't add NSPhotoLibraryUsageDescription to Info.plist");
   } else {
     const project = xcode.project(projectConfig.ios.pbxprojPath).parseSync();
