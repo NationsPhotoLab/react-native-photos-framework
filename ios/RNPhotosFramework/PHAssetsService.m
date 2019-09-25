@@ -142,21 +142,23 @@
 
     for(int i = 0; i < resources.count;i++) {
         PHAssetResource *resourceMetadata = [resources objectAtIndex:i];
-        
         NSString *mimeType = (NSString *)[NSNull null];
         CFStringRef mimeTypeCString = UTTypeCopyPreferredTagWithClass((__bridge CFStringRef _Nonnull)(resourceMetadata.uniformTypeIdentifier), kUTTagClassMIMEType);
         if(mimeTypeCString != nil) {
             mimeType = (__bridge NSString *)(mimeTypeCString);
         }
-        
-        [arrayWithResourcesMetadata addObject:@{
-                                                     @"originalFilename" : resourceMetadata.originalFilename,
-                                                     @"assetLocalIdentifier" : resourceMetadata.assetLocalIdentifier,
-                                                     @"uniformTypeIdentifier" : resourceMetadata.uniformTypeIdentifier,
-                                                     @"type" : [[RCTConvert PHAssetResourceTypeValuesReversed] objectForKey:@(resourceMetadata.type)],
-                                                     @"mimeType" : mimeType,
-                                                     @"fileExtension" : [resourceMetadata.originalFilename pathExtension]
-                                                     }];
+        NSString *type = [[RCTConvert PHAssetResourceTypeValuesReversed] objectForKey:@(resourceMetadata.type)];
+        if (type) {
+          // Ignore unknown resource types
+          [arrayWithResourcesMetadata addObject:@{
+                                                       @"originalFilename" : resourceMetadata.originalFilename,
+                                                       @"assetLocalIdentifier" : resourceMetadata.assetLocalIdentifier,
+                                                       @"uniformTypeIdentifier" : resourceMetadata.uniformTypeIdentifier,
+                                                       @"type" : type,
+                                                       @"mimeType" : mimeType,
+                                                       @"fileExtension" : [resourceMetadata.originalFilename pathExtension]
+                                                       }];
+        }
     }
 
     [dictToExtend setObject:arrayWithResourcesMetadata forKey:@"resourcesMetadata"];
